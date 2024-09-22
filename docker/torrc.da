@@ -1,0 +1,8 @@
+AuthoritativeDirectory 1
+V3AuthoritativeDirectory 1
+DirPort 80
+SocksPort 0
+ORPort 9001 IPv4Only
+TestingDirAuthVoteGuard *
+TestingDirAuthVoteExit *
+TestingDirAuthVoteHSDir *

@@ -1,0 +1,5 @@
+TestingTorNetwork 1
+AssumeReachable 1
+AddressDisableIPv6 1
+ControlPort 9051
+CookieAuthentication 1

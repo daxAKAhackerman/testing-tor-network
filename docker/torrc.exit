@@ -1,0 +1,3 @@
+SocksPort 0
+ORPort 9001 IPv4Only
+ExitRelay 1
