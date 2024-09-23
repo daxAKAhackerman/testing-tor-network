@@ -5,6 +5,7 @@ NO_FAILURE := || true
 
 DOCKER_DIR := docker
 CLI_DIR := cli
+STATUS_FILE := $(CLI_DIR)/status.json
 
 # If for some reason you don't like 10.5.0.0/16, you can change it here
 TOR_SUBNET := 10.5.0.0/16
@@ -21,3 +22,9 @@ install-dev:
 lint:
 	@pipenv run black --line-length=160 $(CLI_DIR)
 	@pipenv run isort --profile=black $(CLI_DIR)
+
+nuke:
+	@docker ps | grep -oP testing-tor-.+ | xargs docker kill
+	@docker ps -a | grep -oP testing-tor-.+ | xargs docker rm
+	@docker volume rm testing-tor
+	@rm $(STATUS_FILE)

@@ -226,7 +226,9 @@ def get_hs_info():
 
             exit_code, output = container.exec_run("cat /etc/tor/torrc")
             print("### BASE TORRC FILE TO USE ###")
-            print(output.decode())
+            for line in output.decode().lstrip().split("\n"):
+                if not line.startswith("#"):
+                    print(line)
             print("### BASE DOCKER COMMAND TO RUN ###")
             print("$ docker run --network testing-tor my-hidden-service\n")
 
