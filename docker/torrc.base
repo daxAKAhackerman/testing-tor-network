@@ -1,0 +1,12 @@
+# This automatically sets a few options that are required to setup a testing network
+TestingTorNetwork 1
+
+# This will speed up the process of adding nodes
+AssumeReachable 1
+
+# We disable IPv6 since we don't use it
+AddressDisableIPv6 1
+
+# We activate the control port to use nyx
+ControlPort 9051
+CookieAuthentication 1

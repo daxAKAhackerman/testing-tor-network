@@ -1,0 +1,16 @@
+# These two lines make the node act as a DA
+AuthoritativeDirectory 1
+V3AuthoritativeDirectory 1
+
+# DirPort and ORPort are required for DAs
+DirPort 80 IPv4Only
+ORPort 9001 IPv4Only
+
+# Disable the client port
+SocksPort 0
+
+# Without the following lines, if you stop the network and boot it again later, the nodes will have trouble getting their flags again
+# This is because flags are given based on the fraction of uptime compared to the relay lifetime
+TestingDirAuthVoteGuard *
+TestingDirAuthVoteExit *
+TestingDirAuthVoteHSDir *

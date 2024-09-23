@@ -1,0 +1,2 @@
+# We specifically listen on 0.0.0.0 to allow the host to connect through an exposed Docker port
+SocksPort 0.0.0.0:9050
