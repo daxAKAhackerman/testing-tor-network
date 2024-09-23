@@ -1,2 +1,5 @@
+# Disable the client port
 SocksPort 0
+
+# ORPort is required for relays
 ORPort 9001 IPv4Only

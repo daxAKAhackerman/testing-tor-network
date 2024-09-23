@@ -1,7 +1,6 @@
 import json
 import os
 import pathlib
-import random
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -44,7 +43,13 @@ class ContainerEntry:
 
     @staticmethod
     def from_dict(obj: dict[str, str]) -> "ContainerEntry":
-        return ContainerEntry(**obj)  # type: ignore
+        return ContainerEntry(
+            role=Role[obj["role"]],
+            container_name=obj["container_name"],
+            container_id=obj["container_id"],
+            status=ContainerStatus[obj["status"]],
+            ip_addr=obj["ip_addr"],
+        )
 
 
 class Status:
@@ -89,15 +94,7 @@ class Status:
         Status.put(status)
 
     @classmethod
-    def get_free_ip_octet(cls) -> str:
-        used_ips = set()
-        status = cls.get()
+    def get_used_ip_list(cls) -> set[str]:
+        status = Status.get()
 
-        for container_entry in status:
-            used_ips.add(container_entry["ip_addr"].split(".")[-1])
-
-        ip = random.randint(10, 250)
-        while ip in used_ips:
-            ip = random.randint(10, 250)
-
-        return str(ip)
+        return set([container_entry["ip_addr"] for container_entry in status])
