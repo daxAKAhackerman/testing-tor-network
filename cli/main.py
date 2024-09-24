@@ -75,7 +75,11 @@ def add_exit():
 
 
 @app.command()
-def add_hs():
+def add_hs(
+    hs_port: Optional[int] = typer.Option(80, help="The port to for the hidden service to listen for requests"),
+    service_ip: Optional[str] = typer.Option("127.0.0.1", help="The IP address of the service"),
+    service_port: Optional[int] = typer.Option(80, help="The port of the service"),
+):
     """
     Add a hidden service to the network.
     It will forward any TOR traffic on port 80 to localhost port 80.
@@ -83,7 +87,9 @@ def add_hs():
     """
 
     print(f"[-] Adding new hidden service container...")
-    name, ip_addr, container = create_container(docker_client, Role.HS)
+    name, ip_addr, container = create_container(
+        docker_client, Role.HS, extra_env_vars={"HS_PORT": hs_port, "SERVICE_IP": service_ip, "SERVICE_PORT": service_port}
+    )
 
     container_entry = ContainerEntry(Role.HS, name, container["Id"], status=ContainerStatus.RUNNING, ip_addr=ip_addr)
     Status.add_container_entry(container_entry)
@@ -121,7 +127,10 @@ def stop_container(name: str):
         container = docker_client.containers.get(name)
 
         print(f"[-] Stopping container {name}...")
-        container.stop()
+        try:
+            container.stop()
+        except:
+            print("[!] Failed to stop container, is it already stopped?")
 
         Status.remove_container_entry(container_entry)
         container_entry.status = ContainerStatus.STOPPED
@@ -210,7 +219,7 @@ def restart_network():
 
 
 @app.command()
-def get_hs_info():
+def get_hs_torrc():
     """
     If you want to create your own container running a hidden service and attach it to the network, this command
     will give you an example of a working torrc file that you can use, as well as a sample Docker command to start
@@ -225,12 +234,9 @@ def get_hs_info():
             container = docker_client.containers.get(container_entry.container_id)
 
             exit_code, output = container.exec_run("cat /etc/tor/torrc")
-            print("### BASE TORRC FILE TO USE ###")
             for line in output.decode().lstrip().split("\n"):
                 if not line.startswith("#"):
                     print(line)
-            print("### BASE DOCKER COMMAND TO RUN ###")
-            print("$ docker run --network testing-tor my-hidden-service\n")
 
             raise typer.Exit(0)
 
