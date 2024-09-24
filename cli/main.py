@@ -127,10 +127,7 @@ def stop_container(name: str):
         container = docker_client.containers.get(name)
 
         print(f"[-] Stopping container {name}...")
-        try:
-            container.stop()
-        except:
-            print("[!] Failed to stop container, is it already stopped?")
+        container.stop()
 
         Status.remove_container_entry(container_entry)
         container_entry.status = ContainerStatus.STOPPED
