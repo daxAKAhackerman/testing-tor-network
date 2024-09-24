@@ -94,7 +94,7 @@ $ make nuke -i
 
 ## Adding your own hidden service
 
-Once you have a fully functional TOR testing network running, a next logical step could be to add your own hidden services. The one provided by the command `add-hs` is very basic and only exposes port 80, with no actual service running behind it. Adding your own service can be achieved in multiple ways:
+Once you have a fully functional TOR testing network running, a next logical step could be to add your own hidden services. The one provided by the command `add-hs` is very basic and only exposes port 80 by default, with no actual service running behind it. Adding your own service can be achieved in multiple ways:
 
 ### Adding a container running only the service and have an HS node forward HS requests to it
 
@@ -112,7 +112,7 @@ This can be usefull if your container already exists and you don't want to recre
 2. If it's already running, stop your service container. 
 3. Attach a new network interface to your service: `docker network connect --ip THE_IP_YOU_CHOSE testing-tor mycontainer`.
 4. Start your service again.
-5. Start an HS container specifying the information of your service: `python cli/main.py add-hs --hs-port THE_PORT_TO_OPEN_TO_TOR --service-ip THE_IP_YOU_CHOSE --service-port THE_PORT_OF_YOUR_SERVICE`. Be sure that your service is listening on the correct interface (not just the loopback adapter). 
+5. Start an HS container specifying the information of your service: `python cli/main.py add-hs --hs-port THE_PORT_TO_OPEN_TO_TOR --service-ip THE_IP_YOU_CHOSE --service-port THE_PORT_OF_YOUR_SERVICE`. Be sure that your service is listening on the correct interface (not just the loopback adapter or the original interface). 
 
 ### Adding a container running both the TOR HS and the service
 
