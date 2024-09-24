@@ -16,10 +16,7 @@ def stop_all_containers(docker_client: docker.DockerClient) -> None:
         container_entry = ContainerEntry.from_dict(container_entry)
         container = docker_client.containers.get(container_entry.container_id)
         print(f"[-] Stopping container {container_entry.container_name}...")
-        try:
-            container.stop()
-        except:
-            print("[!] Failed to stop container, is it already stopped?")
+        container.stop()
 
         Status.remove_container_entry(container_entry)
         container_entry.status = ContainerStatus.STOPPED
@@ -83,12 +80,11 @@ def remove_container(docker_client: docker.DockerClient, container_entry: Contai
     container = docker_client.containers.get(container_entry.container_name)
 
     if container_entry.role == Role.DA:
+        if container_entry.status != ContainerStatus.RUNNING:
+            container.start()
         container.exec_run("/opt/cleanup_da.sh")
 
-    try:
-        container.stop()
-    except:
-        print("[!] Failed to stop container, trying to remove it...")
+    container.stop()
     container.remove()
 
     Status.remove_container_entry(container_entry)
