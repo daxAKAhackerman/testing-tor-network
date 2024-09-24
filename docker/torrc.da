@@ -12,5 +12,4 @@ SocksPort 0
 # Without the following lines, if you stop the network and boot it again later, the nodes will have trouble getting their flags again
 # This is because flags are given based on the fraction of uptime compared to the relay lifetime
 TestingDirAuthVoteGuard *
-TestingDirAuthVoteExit *
 TestingDirAuthVoteHSDir *

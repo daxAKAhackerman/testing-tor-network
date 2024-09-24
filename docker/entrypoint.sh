@@ -42,8 +42,8 @@ function bootstrap {
         echo $(tr -dc A-Za-z0-9 </dev/urandom | head -c 12) | sudo -u debian-tor tor-gencert --create-identity-key -m 12 -a ${IP_ADDR}:80 --passphrase-fd 0
 
         cd ${TOR_DIR}
-        # This generates the fingerprint files. The --dirauthority is required here because without it tor will fail and say that you 
-        # must have DirAuthority statements in your torrc file if TestingTorNetwork is set. The value doesn't matter though. 
+        # This generates the fingerprint files. The --dirauthority is required here because without it tor will fail and say that you
+        # must have DirAuthority statements in your torrc file if TestingTorNetwork is set. The value doesn't matter though.
         sudo -u debian-tor tor --list-fingerprint --dirauthority "placeholder 127.0.0.1:80 0000000000000000000000000000000000000000"
 
         AUTH_CERT_FINGERPRINT=$(grep "fingerprint" ${KEYS_DIR}/authority_certificate | cut -d " " -f 2)
@@ -80,6 +80,16 @@ function bootstrap {
     hs)
         echo "Setting up node as a hidden service"
         cat ${TORRC_HS} >>${TORRC}
+        if [[ -z "${HS_PORT}" ]]; then
+            HS_PORT="80"
+        fi
+        if [[ -z "${SERVICE_PORT}" ]]; then
+            SERVICE_PORT="80"
+        fi
+        if [[ -z "${SERVICE_IP}" ]]; then
+            SERVICE_IP="127.0.0.1"
+        fi
+        echo HiddenServicePort ${HS_PORT} ${SERVICE_IP}:${SERVICE_PORT} >>${TORRC}
         ;;
     *)
         echo "Unknown node type, exiting"
@@ -99,7 +109,7 @@ fi
 cat ${STATUS_AUTHORITIES} >>${TORRC}
 sort -uo ${TORRC} ${TORRC}
 
-# If a Docker CMD is specify, run it. Else, boot TOR! 
+# If a Docker CMD is specify, run it. Else, boot TOR!
 if [[ ! -z "$@" ]]; then
     exec $@
 else

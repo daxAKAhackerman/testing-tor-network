@@ -8,13 +8,18 @@ from status import ContainerEntry, ContainerStatus, Role, Status
 
 import docker
 
+NUMBER_OF_FIRST_IPS_TO_EXCLUDE = 32
+
 
 def stop_all_containers(docker_client: docker.DockerClient) -> None:
     for container_entry in Status.get():
         container_entry = ContainerEntry.from_dict(container_entry)
         container = docker_client.containers.get(container_entry.container_id)
         print(f"[-] Stopping container {container_entry.container_name}...")
-        container.stop()
+        try:
+            container.stop()
+        except:
+            print("[!] Failed to stop container, is it already stopped?")
 
         Status.remove_container_entry(container_entry)
         container_entry.status = ContainerStatus.STOPPED
@@ -33,7 +38,9 @@ def start_all_containers(docker_client: docker.DockerClient) -> None:
         Status.add_container_entry(container_entry)
 
 
-def create_container(docker_client: docker.DockerClient, role: Role, exposed_client_port: Optional[int] = None) -> tuple[str, str, dict]:
+def create_container(
+    docker_client: docker.DockerClient, role: Role, exposed_client_port: Optional[int] = None, extra_env_vars: dict = {}
+) -> tuple[str, str, dict]:
     # Generate name
     identifier = "".join(random.choices(string.ascii_lowercase, k=8))
     name = f"testing-tor-{role.lower()}-{identifier}"
@@ -42,8 +49,8 @@ def create_container(docker_client: docker.DockerClient, role: Role, exposed_cli
     network = docker_client.networks.get("testing-tor")
     subnet = network.attrs["IPAM"]["Config"][0]["Subnet"]
     subnet = ipaddress.ip_network(subnet)
-    first_ip = int(subnet.network_address)
-    last_ip = int(subnet.broadcast_address)
+    first_ip = int(subnet.network_address) + NUMBER_OF_FIRST_IPS_TO_EXCLUDE
+    last_ip = int(subnet.broadcast_address) - 1
     ip_addr = str(ipaddress.ip_address(random.randint(first_ip, last_ip)))
     while ip_addr in Status.get_used_ip_list():
         ip_addr = str(ipaddress.ip_address(random.randint(first_ip, last_ip)))
@@ -59,7 +66,7 @@ def create_container(docker_client: docker.DockerClient, role: Role, exposed_cli
         image="testing-tor",
         detach=True,
         name=name,
-        environment={"ROLE": role.lower(), "NICK": f"{role.lower()}{identifier}"},
+        environment={"ROLE": role.lower(), "NICK": f"{role.lower()}{identifier}", **extra_env_vars},
         volumes=["/status"],
         networking_config=docker_client.api.create_networking_config({"testing-tor": docker_client.api.create_endpoint_config(ipv4_address=ip_addr)}),
         host_config=host_config,
@@ -78,7 +85,10 @@ def remove_container(docker_client: docker.DockerClient, container_entry: Contai
     if container_entry.role == Role.DA:
         container.exec_run("/opt/cleanup_da.sh")
 
-    container.stop()
+    try:
+        container.stop()
+    except:
+        print("[!] Failed to stop container, trying to remove it...")
     container.remove()
 
     Status.remove_container_entry(container_entry)
