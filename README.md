@@ -33,8 +33,8 @@ The following will show you how to setup a testing TOR network comprised of 3 di
 
 ```bash
 # Start by adding DAs
-# By default we need an agreement of 2/3 DAs to reach consensus, so we'll create 3 DAs
-# You can always add more, but if you want to go with less, you'll have to adjust the docker/torrc.da file using the AuthDirNumSRVAgreements directive
+# We need an agreement of 2/3 DAs to reach consensus, so we'll create 3 DAs
+# You can always add more, but if you want to go with less, you'll probably have to patch the TOR binary to adjust the AuthDirNumSRVAgreements consensus parameter
 $ python cli/main.py add-da && python cli/main.py add-da && python cli/main.py add-da
 
 # If you're lucky, all DAs will be added to the consensus under 5 minutes
