@@ -90,6 +90,6 @@ def remove_container(docker_client: docker.DockerClient, container_entry: Contai
     Status.remove_container_entry(container_entry)
 
     if container_entry.role == Role.DA and restart:
-        print(f"[-] Removing a DA requires restarting all nodes...")
+        print(f"[-] Removing a DA requires restarting all containers...")
         stop_all_containers(docker_client)
         start_all_containers(docker_client)
