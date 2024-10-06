@@ -113,5 +113,5 @@ sort -uo ${TORRC} ${TORRC}
 if [[ ! -z "$@" ]]; then
     exec $@
 else
-    sudo -u debian-tor tor
+    sudo -u debian-tor tor -f /etc/tor/torrc
 fi
