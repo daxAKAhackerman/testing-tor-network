@@ -19,6 +19,9 @@ install:
 install-dev:
 	@pipenv install --dev
 
+lock-requirements:
+	@pipenv requirements > requirements.txt
+
 lint:
 	@pipenv run black --line-length=160 $(CLI_DIR)
 	@pipenv run isort --profile=black $(CLI_DIR)

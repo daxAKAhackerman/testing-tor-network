@@ -15,6 +15,9 @@ In this repository, I've added lots of comments in configuration files and shell
 
 # Install the CLI dependencies using pipenv, build the Docker image and create the Docker volume and network
 $ make
+
+# The project uses pipenv and Python3.12 by default
+# If this doesn't work for you, you can use the requirements.txt file and manage the virtual environment yourself
 ```
 
 ## Usage
