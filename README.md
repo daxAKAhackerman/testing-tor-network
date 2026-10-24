@@ -1,11 +1,11 @@
-# Testing TOR network
-CLI tool to setup a testing TOR network with Docker
+# Testing Tor network
+CLI tool to setup a testing Tor network with Docker
 
 ## Why
 
-This repository was created out of curiosity about the TOR (The Onion Router) network. The goal was to understand how to manually setup a working testing network in a Docker environment and to experiment with different node configurations. The required knowledge to achieve this is spread thinly across the web and there are very few (if any) up to date example of how to do this. 
+This repository was created out of curiosity about the Tor (The Onion Router) network. The goal was to understand how to manually setup a working testing network in a Docker environment and to experiment with different node configurations. The required knowledge to achieve this is spread thinly across the web and there are very few (if any) up to date example of how to do this. 
 
-In this repository, I've added lots of comments in configuration files and shell scripts to explain why every line has to be in there. I've also added a Python CLI to ease the container management, but it is in no way required. If you want to setup your own TOR network based on the torrc files and docker entrypoint, go for it. 
+In this repository, I've added lots of comments in configuration files and shell scripts to explain why every line has to be in there. I've also added a Python CLI to ease the container management, but it is in no way required. If you want to setup your own Tor network based on the torrc files and docker entrypoint, go for it. 
 
 ## Installation
 
@@ -32,7 +32,7 @@ $ python cli/main.py --help
 
 ## Complete example
 
-The following will show you how to setup a testing TOR network comprised of 3 directory authorities, 5 mid/guard relays, 3 exit relays, 1 hidden service and 1 client. The client will expose the TOR SOCKSv5 to the host on port 9050 so that we can access the HS using a proxy configuration in the browser (I personally use a browser extension such as FoxyProxy). We will start a simple python http server to act as the HS. 
+The following will show you how to setup a testing Tor network comprised of 3 directory authorities, 5 mid/guard relays, 3 exit relays, 1 hidden service and 1 client. The client will expose the Tor SOCKSv5 to the host on port 9050 so that we can access the HS using a proxy configuration in the browser (I personally use a browser extension such as FoxyProxy). We will start a simple python http server to act as the HS. 
 
 ```bash
 # Start by adding DAs
@@ -70,12 +70,12 @@ $ python cli/main.py container get-onion-domain testing-tor-hs-00000000
 $ docker exec -it testing-tor-hs-00000000 bash
 $ mkdir webroot
 $ cd webroot
-$ echo "<h1>Hello from my own TOR network!</h1>" > index.html
+$ echo "<h1>Hello from my own Tor network!</h1>" > index.html
 $ python3 -m http.server 80
 
 # You can now configure any browser to use the SocksPort you specified when creating the client and you should be able to reach your python http server using the onion hostname from the HS container. 
 
-# Congratulations, you are now the proud owner of a fully functional TOR testing network! 
+# Congratulations, you are now the proud owner of a fully functional Tor testing network! 
 
 # The CLI can also be used for a few routine operations such as:
 $ python cli/main.py container start # Starts the specified container
@@ -93,7 +93,7 @@ $ make nuke -i
 
 ## Adding your own hidden service
 
-Once you have a fully functional TOR testing network running, a next logical step could be to add your own hidden services. The one provided by the command `add-hs` is very basic and only exposes port 80 by default, with no actual service running behind it. Adding your own service can be achieved in multiple ways:
+Once you have a fully functional Tor testing network running, a next logical step could be to add your own hidden services. The one provided by the command `add-hs` is very basic and only exposes port 80 by default, with no actual service running behind it. Adding your own service can be achieved in multiple ways:
 
 ### Adding a container running only the service and have an HS node forward HS requests to it
 
@@ -113,14 +113,14 @@ This can be usefull if your container already exists and you don't want to recre
 4. Start your service again.
 5. Start an HS container specifying the information of your service: `python cli/main.py container add-hs --hs-port THE_PORT_TO_OPEN_TO_TOR --service-ip THE_IP_YOU_CHOSE --service-port THE_PORT_OF_YOUR_SERVICE`. Be sure that your service is listening on the correct interface (not just the loopback adapter or the original interface). 
 
-### Adding a container running both the TOR HS and the service
+### Adding a container running both the Tor HS and the service
 
 This is a bit more complex, but if you are low on resources it can save you one container per HS. 
 
 1. Create a Dockerfile containing your service
-2. Install TOR in it. You can check the [Dockerfile](docker/Dockerfile), or even better [the official TOR documentation](https://community.torproject.org/onion-services/setup/install/).
-3. Be sure to start the TOR service in your entrypoint or command
-4. Populate your `/etc/tor/torrc` file. The CLI provides a command to give the directives you need: `python cli/main.py container get-hs-torrc <hs-container-name>`. This will print the full torrc file that you need to put in your container in order for it to be able to connect to the TOR testing network. You will probably need to adjust a few directives (ex: the port to forward the HS traffic to). Note that you need to have a working network with a HS node for the command to work. 
+2. Install Tor in it. You can check the [Dockerfile](docker/Dockerfile), or even better [the official Tor documentation](https://community.torproject.org/onion-services/setup/install/).
+3. Be sure to start the Tor service in your entrypoint or command
+4. Populate your `/etc/tor/torrc` file. The CLI provides a command to give the directives you need: `python cli/main.py container get-hs-torrc <hs-container-name>`. This will print the full torrc file that you need to put in your container in order for it to be able to connect to the Tor testing network. You will probably need to adjust a few directives (ex: the port to forward the HS traffic to). Note that you need to have a working network with a HS node for the command to work. 
 5. Choose an IP address for your service. By default, the CLI will always exclude the first 32 IP addresses of the subnet to assign IPs to the nodes, so choose an IP in this range (excluding `.0` and `.1` since they are used by Docker). If you need more than 30 IPs, you can adjust the `NUMBER_OF_FIRST_IPS_TO_EXCLUDE` variable in `cli/container.py`. 
 6. Start your container using the correct network (ex: `docker start --network testing-tor --ip THE_IP_YOU_CHOSE mycontainer`).
 
